@@ -213,7 +213,7 @@ int8_t TheThingsNode::getTemperatureAsInt()
 float TheThingsNode::getTemperatureAsFloat()
 {
   enableTemperature();
-  int8_t value = TTN_TEMPERATURE_SENSOR.getTAFloat();
+  float value = TTN_TEMPERATURE_SENSOR.getTAFloat();
   if (!this->temperatureAlertEnabled)
   {
     disableTemperature();
