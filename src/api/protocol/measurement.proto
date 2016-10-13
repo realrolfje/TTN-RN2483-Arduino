@@ -1,0 +1,8 @@
+syntax="proto2";
+
+package api;
+
+message Measurement {
+        required bool motion = 1;
+        required uint32 water = 2;
+}
