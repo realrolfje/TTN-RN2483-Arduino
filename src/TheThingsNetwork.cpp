@@ -69,13 +69,28 @@ bool TheThingsNetwork::sendCommand(String cmd, const byte *buf, int length) {
   return sendCommand(str);
 }
 
+void TheThingsNetwork::autobaud() {
+  debugPrint(F("Autobaud: "));
+  modemStream->write((byte)0x00);
+  modemStream->write(0x55);
+  readValue("sys get ver"); // get rid of spurious data in buffer
+  String version = readValue("sys get ver");
+  model = version.substring(0, version.indexOf(' '));  
+  debugPrintLn(version);
+}
+
 void TheThingsNetwork::reset(bool adr) {
-  String version = readValue(F("sys reset"));
-  model = version.substring(0, version.indexOf(' '));
-  debugPrint(F("Version is "));
-  debugPrint(version);
-  debugPrint(F(", model is "));
-  debugPrintLn(model);
+  if (!model) {
+    // Only send reset if model is not already set.
+    // After "sys reset" the radio is back at 56700 baud, which
+    // may mean that communication to the module is lost.
+    String version = readValue(F("sys reset"));
+    model = version.substring(0, version.indexOf(' '));
+    debugPrint(F("Version is "));
+    debugPrint(version);
+    debugPrint(F(", model is "));
+    debugPrintLn(model);
+  }
 
   String devEui = readValue(F("sys get hweui"));
   String str = "";
@@ -206,14 +221,14 @@ int TheThingsNetwork::poll(int port, bool confirm) {
 }
 
 void TheThingsNetwork::showStatus() {
-  debugPrint(F("EUI: "));
+  debugPrint(F("HW EUI: "));
   debugPrintLn(readValue(F("sys get hweui")));
-  debugPrint(F("Battery: "));
-  debugPrintLn(readValue(F("sys get vdd")));
-  debugPrint(F("AppEUI: "));
-  debugPrintLn(readValue(F("mac get appeui")));
   debugPrint(F("DevEUI: "));
   debugPrintLn(readValue(F("mac get deveui")));
+  debugPrint(F("AppEUI: "));
+  debugPrintLn(readValue(F("mac get appeui")));
+  debugPrint(F("Battery: "));
+  debugPrintLn(readValue(F("sys get vdd")));
 
   if (this->model == F("RN2483")) {
     debugPrint(F("Band: "));
