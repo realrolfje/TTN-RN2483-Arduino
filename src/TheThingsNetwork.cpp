@@ -72,6 +72,7 @@ bool TheThingsNetwork::sendCommand(String cmd, const byte *buf, int length) {
 void TheThingsNetwork::autobaud() {
   debugPrint(F("Autobaud: "));
   modemStream->write((byte)0x00);
+  modemStream->write((byte)0x00);
   modemStream->write(0x55);
   readValue("sys get ver"); // get rid of spurious data in buffer
   String version = readValue("sys get ver");
